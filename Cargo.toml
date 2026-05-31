@@ -1,11 +1,11 @@
 [package]
 name = "nl3-rs"
-version = "1.0.1"
+version = "1.0.2"
 edition = "2024"
 rust-version = "1.95"
 description = "Natural language triples — parse plain-English Subject-Predicate-Object phrases into validated triples."
 license = "MIT"
-repository = "https://github.com/defstream/nl3"
+repository = "https://github.com/defstream/nl3-rs"
 keywords = ["nlp", "triple", "rdf", "parser", "natural-language"]
 categories = ["text-processing", "parser-implementations"]
 
