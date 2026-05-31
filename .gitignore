@@ -1,0 +1,18 @@
+# Rust build artifacts
+/target/
+
+# Backtraces emitted on panic
+rustc-ice-*.txt
+
+# IDE / editor
+/.idea/
+/.vscode/
+*.iml
+*.swp
+*~
+
+# macOS
+.DS_Store
+
+# Note: Cargo.lock IS committed (CI builds with --locked), and the vendored
+# GitHub Pages files in assets/ are tracked — neither is ignored.

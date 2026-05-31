@@ -1,0 +1,505 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>nl3 - Natural Language Triples for Rust</title>
+    <meta
+      name="description"
+      content="nl3 parses short plain-English Subject–Predicate–Object phrases into validated triples. A fast, dependency-light Rust library."
+    />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="nl3 - Natural Language Triples for Rust" />
+    <meta
+      property="og:description"
+      content="Parse plain-English Subject–Predicate–Object phrases into validated triples."
+    />
+    <meta property="og:type" content="website" />
+
+    <!-- Tailwind (vendored locally - no runtime CDN) -->
+    <script src="assets/tailwind.js"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+              mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'monospace'],
+            },
+            colors: {
+              rust: {
+                DEFAULT: '#dea584',
+                deep: '#b7410e',
+              },
+              ink: {
+                900: '#0a0a0f',
+                800: '#111118',
+                700: '#181820',
+                600: '#22222c',
+              },
+            },
+            keyframes: {
+              floaty: {
+                '0%,100%': { transform: 'translateY(0)' },
+                '50%': { transform: 'translateY(-6px)' },
+              },
+              fadeup: {
+                '0%': { opacity: '0', transform: 'translateY(12px)' },
+                '100%': { opacity: '1', transform: 'translateY(0)' },
+              },
+            },
+            animation: {
+              floaty: 'floaty 5s ease-in-out infinite',
+              fadeup: 'fadeup 0.6s ease-out both',
+            },
+          },
+        },
+      };
+    </script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- highlight.js for Rust syntax (vendored locally) -->
+    <link rel="stylesheet" href="assets/atom-one-dark.min.css" />
+    <script src="assets/highlight.min.js"></script>
+    <script src="assets/rust.min.js"></script>
+
+    <style>
+      body {
+        background:
+          radial-gradient(60rem 40rem at 85% -10%, rgba(222, 165, 132, 0.12), transparent 60%),
+          radial-gradient(50rem 40rem at -10% 20%, rgba(183, 65, 14, 0.1), transparent 55%),
+          #0a0a0f;
+      }
+      .grid-bg {
+        background-image:
+          linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+        background-size: 44px 44px;
+      }
+      .card-glow:hover {
+        box-shadow: 0 0 0 1px rgba(222, 165, 132, 0.35), 0 18px 50px -20px rgba(222, 165, 132, 0.4);
+      }
+      pre code.hljs {
+        background: transparent;
+        padding: 0;
+        font-family: 'JetBrains Mono', ui-monospace, monospace;
+        font-size: 0.86rem;
+        line-height: 1.65;
+      }
+    </style>
+  </head>
+
+  <body class="font-sans text-slate-300 antialiased selection:bg-rust/30 selection:text-white">
+    <!-- NAV -->
+    <header class="sticky top-0 z-50 border-b border-white/5 bg-ink-900/70 backdrop-blur-xl">
+      <nav class="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+        <a href="#top" class="flex items-center gap-2.5 font-bold text-white">
+          <span
+            class="grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-rust to-rust-deep text-sm font-extrabold text-ink-900"
+            >n3</span
+          >
+          <span class="tracking-tight">nl3<span class="text-rust">·rs</span></span>
+        </a>
+        <div class="hidden items-center gap-8 text-sm font-medium text-slate-400 md:flex">
+          <a href="#how" class="transition hover:text-white">How it works</a>
+          <a href="#features" class="transition hover:text-white">Features</a>
+          <a href="#examples" class="transition hover:text-white">Examples</a>
+          <a href="#install" class="transition hover:text-white">Install</a>
+        </div>
+        <a
+          href="https://github.com/defstream/nl3-rs "
+          class="group inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3.5 py-2 text-sm font-semibold text-white transition hover:border-rust/50 hover:bg-rust/10"
+        >
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path
+              d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.2.8-.6v-2c-3.2.7-3.9-1.4-3.9-1.4-.5-1.3-1.3-1.7-1.3-1.7-1.1-.7.1-.7.1-.7 1.1.1 1.7 1.2 1.7 1.2 1 1.7 2.7 1.2 3.3.9.1-.7.4-1.2.7-1.5-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.4-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.2 1.2a11 11 0 0 1 5.8 0C17 5 18 5.3 18 5.3c.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6 4.6-1.5 7.9-5.8 7.9-10.9C23.5 5.7 18.3.5 12 .5Z"
+            />
+          </svg>
+          Star
+        </a>
+      </nav>
+    </header>
+
+    <!-- HERO -->
+    <section id="top" class="relative overflow-hidden">
+      <div class="grid-bg pointer-events-none absolute inset-0 [mask-image:radial-gradient(50rem_30rem_at_50%_0,black,transparent)]"></div>
+      <div class="relative mx-auto max-w-6xl px-6 pb-20 pt-20 md:pt-28">
+        <div class="mx-auto max-w-3xl text-center">
+          <span
+            class="animate-fadeup inline-flex items-center gap-2 rounded-full border border-rust/30 bg-rust/10 px-3 py-1 text-xs font-semibold text-rust"
+          >
+            <span class="h-1.5 w-1.5 rounded-full bg-rust"></span>
+
+          </span>
+          <h1
+            class="animate-fadeup mt-6 text-4xl font-extrabold leading-[1.05] tracking-tight text-white sm:text-6xl"
+          >
+            Plain English in.
+            <span class="bg-gradient-to-r from-rust to-amber-200 bg-clip-text text-transparent"
+              >Structured triples out.</span
+            >
+          </h1>
+          <p class="animate-fadeup mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-slate-400">
+            <strong class="text-slate-200">nl3</strong> parses short
+            <em>Subject&nbsp;·&nbsp;Predicate&nbsp;·&nbsp;Object</em> phrases into validated triples.
+            Describe your domain with a grammar and a vocabulary - nl3 handles the synonyms, tenses,
+            and reversed phrasings.
+          </p>
+          <div class="animate-fadeup mt-9 flex flex-wrap items-center justify-center gap-3">
+            <aAll All
+              href="#install"
+              class="rounded-xl bg-gradient-to-br from-rust to-rust-deep px-6 py-3 text-sm font-bold text-ink-900 shadow-lg shadow-rust/20 transition hover:scale-[1.03]"
+              >Get started</aAll
+            >
+            <a
+              href="#examples"
+              class="rounded-xl border border-white/10 bg-white/5 px-6 py-3 text-sm font-semibold text-white transition hover:border-white/25"
+              >See examples</a
+            >
+          </div>
+        </div>
+
+        <!-- The flow visual -->
+        <div class="animate-fadeup mt-16">
+          <div
+            class="mx-auto max-w-4xl rounded-2xl border border-white/10 bg-ink-800/60 p-4 shadow-2xl backdrop-blur sm:p-6"
+          >
+            <div class="mb-5 flex items-center gap-1.5 px-1">
+              <span class="h-3 w-3 rounded-full bg-red-400/80"></span>
+              <span class="h-3 w-3 rounded-full bg-yellow-400/80"></span>
+              <span class="h-3 w-3 rounded-full bg-green-400/80"></span>
+              <span class="ml-3 font-mono text-xs text-slate-500">nl3.parse(…)</span>
+            </div>
+
+            <!-- input -->
+            <div class="rounded-lg border border-white/5 bg-ink-900/70 px-4 py-3 text-center font-mono text-sm text-slate-300">
+              "user <span class="text-amber-200">jack</span> contacts user
+              <span class="text-amber-200">jill</span>"
+            </div>
+
+            <!-- arrow -->
+            <div class="my-3 flex justify-center text-rust">
+              <svg class="h-6 w-6 animate-floaty" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 5v14M5 12l7 7 7-7" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </div>
+
+            <!-- output triple -->
+            <div class="grid gap-3 sm:grid-cols-3">
+              <div class="rounded-lg border border-sky-400/20 bg-sky-400/5 p-4">
+                <div class="text-[11px] font-semibold uppercase tracking-wider text-sky-300/80">Subject</div>
+                <div class="mt-1.5 font-mono text-sm text-white">user</div>
+                <div class="font-mono text-xs text-slate-400">jack</div>
+              </div>
+              <div class="rounded-lg border border-rust/30 bg-rust/5 p-4">
+                <div class="text-[11px] font-semibold uppercase tracking-wider text-rust">Predicate</div>
+                <div class="mt-1.5 font-mono text-sm text-white">message</div>
+                <div class="font-mono text-xs text-slate-500">contacts → message</div>
+              </div>
+              <div class="rounded-lg border border-emerald-400/20 bg-emerald-400/5 p-4">
+                <div class="text-[11px] font-semibold uppercase tracking-wider text-emerald-300/80">Object</div>
+                <div class="mt-1.5 font-mono text-sm text-white">user</div>
+                <div class="font-mono text-xs text-slate-400">jill</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section id="how" class="mx-auto max-w-6xl px-6 py-20">
+      <div class="mx-auto mb-14 max-w-2xl text-center">
+        <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">Three ideas, that's it</h2>
+        <p class="mt-3 text-slate-400">
+          You teach nl3 your domain once, then throw natural phrasings at it.
+        </p>
+      </div>
+      <div class="grid gap-6 md:grid-cols-3">
+        <div class="rounded-2xl border border-white/10 bg-ink-800/40 p-7">
+          <div class="grid h-11 w-11 place-items-center rounded-xl bg-sky-400/10 text-lg font-bold text-sky-300">1</div>
+          <h3 class="mt-5 text-lg font-semibold text-white">Grammar</h3>
+          <p class="mt-2 text-sm leading-relaxed text-slate-400">
+            Declare valid relations as <code class="font-mono text-rust">"Subject Predicate Object"</code>.
+            Words are singularized, so a rule covers every number form.
+          </p>
+        </div>
+        <div class="rounded-2xl border border-white/10 bg-ink-800/40 p-7">
+          <div class="grid h-11 w-11 place-items-center rounded-xl bg-rust/10 text-lg font-bold text-rust">2</div>
+          <h3 class="mt-5 text-lg font-semibold text-white">Vocabulary</h3>
+          <p class="mt-2 text-sm leading-relaxed text-slate-400">
+            Map word <em>stems</em> to predicates so synonyms and tenses -
+            <code class="font-mono text-rust">msg</code>, <code class="font-mono text-rust">messaged</code>,
+            <code class="font-mono text-rust">contacted</code> - all collapse onto one.
+          </p>
+        </div>
+        <div class="rounded-2xl border border-white/10 bg-ink-800/40 p-7">
+          <div class="grid h-11 w-11 place-items-center rounded-xl bg-emerald-400/10 text-lg font-bold text-emerald-300">3</div>
+          <h3 class="mt-5 text-lg font-semibold text-white">Parse</h3>
+          <p class="mt-2 text-sm leading-relaxed text-slate-400">
+            Call <code class="font-mono text-rust">parse()</code> and get a validated
+            <code class="font-mono text-rust">Triple</code> - with reversed phrasings flipped back into shape.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section id="features" class="border-y border-white/5 bg-ink-800/30">
+      <div class="mx-auto max-w-6xl px-6 py-20">
+        <div class="mx-auto mb-14 max-w-2xl text-center">
+          <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">Built for Rust</h2>
+          <p class="mt-3 text-slate-400">Idiomatic API, faithful behavior, light footprint.</p>
+        </div>
+        <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div class="card-glow rounded-2xl border border-white/10 bg-ink-900/50 p-6 transition">
+            <h3 class="font-semibold text-white">Typed results</h3>
+            <p class="mt-2 text-sm leading-relaxed text-slate-400">
+              <code class="font-mono text-rust">Result&lt;Triple, ParseError&gt;</code> instead of
+              throws - empty input and invalid triples are distinct, matchable errors.
+            </p>
+          </div>
+          <div class="card-glow rounded-2xl border border-white/10 bg-ink-900/50 p-6 transition">
+            <h3 class="font-semibold text-white">Builder API</h3>
+            <p class="mt-2 text-sm leading-relaxed text-slate-400">
+              Fluent <code class="font-mono text-rust">Nl3::builder()</code> with ergonomic
+              <code class="font-mono text-rust">IntoIterator</code> inputs for grammar and vocabulary.
+            </p>
+          </div>
+          <div class="card-glow rounded-2xl border border-white/10 bg-ink-900/50 p-6 transition">
+            <h3 class="font-semibold text-white">Pluggable tagger</h3>
+            <p class="mt-2 text-sm leading-relaxed text-slate-400">
+              A lightweight default tagger ships in-box; implement the
+              <code class="font-mono text-rust">Tagger</code> trait to plug in your own - even
+              <code class="font-mono text-rust">rust-bert</code>.
+            </p>
+          </div>
+          <div class="card-glow rounded-2xl border border-white/10 bg-ink-900/50 p-6 transition">
+            <h3 class="font-semibold text-white">Synonyms &amp; tenses</h3>
+            <p class="mt-2 text-sm leading-relaxed text-slate-400">
+              Classic Porter stemming means <code class="font-mono text-rust">sent</code>,
+              <code class="font-mono text-rust">sends</code>, and <code class="font-mono text-rust">mailed</code>
+              fold to one predicate.
+            </p>
+          </div>
+          <div class="card-glow rounded-2xl border border-white/10 bg-ink-900/50 p-6 transition">
+            <h3 class="font-semibold text-white">Auto-flipping</h3>
+            <p class="mt-2 text-sm leading-relaxed text-slate-400">
+              Reversed phrasings are detected against the grammar and flipped into the correctly
+              oriented triple.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- EXAMPLES -->
+    <section id="examples" class="mx-auto max-w-6xl px-6 py-20">
+      <div class="mx-auto mb-12 max-w-2xl text-center">
+        <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">Show me the code</h2>
+        <p class="mt-3 text-slate-400">From one rule to a full domain.</p>
+      </div>
+
+      <!-- tabs -->
+      <div class="mx-auto max-w-3xl">
+        <div class="mb-4 flex flex-wrap gap-2" role="tablist">
+          <button data-tab="quick" class="tab-btn rounded-lg px-4 py-2 text-sm font-semibold transition">Quick start</button>
+          <button data-tab="vocab" class="tab-btn rounded-lg px-4 py-2 text-sm font-semibold transition">Synonyms</button>
+          <button data-tab="infer" class="tab-btn rounded-lg px-4 py-2 text-sm font-semibold transition">Type inference</button>
+          <button data-tab="errors" class="tab-btn rounded-lg px-4 py-2 text-sm font-semibold transition">Errors</button>
+          <button data-tab="tagger" class="tab-btn rounded-lg px-4 py-2 text-sm font-semibold transition">Custom tagger</button>
+        </div>
+
+        <div class="overflow-hidden rounded-2xl border border-white/10 bg-ink-900/70 shadow-2xl">
+          <div class="flex items-center gap-1.5 border-b border-white/5 px-5 py-3">
+            <span class="h-3 w-3 rounded-full bg-red-400/80"></span>
+            <span class="h-3 w-3 rounded-full bg-yellow-400/80"></span>
+            <span class="h-3 w-3 rounded-full bg-green-400/80"></span>
+            <span class="ml-3 font-mono text-xs text-slate-500">main.rs</span>
+          </div>
+          <pre class="overflow-x-auto p-5"><code id="code-block" class="language-rust"></code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- INSTALL -->
+    <section id="install" class="border-t border-white/5 bg-ink-800/30">
+      <div class="mx-auto max-w-3xl px-6 py-20 text-center">
+        <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">Install</h2>
+        <p class="mt-3 text-slate-400">Add it to your <code class="font-mono text-rust">Cargo.toml</code>.</p>
+
+        <div class="group relative mx-auto mt-8 max-w-xl">
+          <pre class="overflow-x-auto rounded-xl border border-white/10 bg-ink-900/80 p-5 text-left"><code class="language-toml font-mono text-sm">[dependencies]
+nl3-rs = "0.1"</code></pre>
+          <button
+            onclick="copyInstall(this)"
+            class="absolute right-3 top-3 rounded-md border border-white/10 bg-white/5 px-2.5 py-1.5 text-xs font-semibold text-slate-300 transition hover:border-rust/50 hover:text-white"
+          >
+            Copy
+          </button>
+        </div>
+
+        <p class="mt-4 text-sm text-slate-500">
+          The crate is imported as <code class="font-mono text-rust">use nl3::Nl3;</code>
+        </p>
+
+        <div class="mt-9 flex flex-wrap items-center justify-center gap-3">
+          <a
+            href="https://github.com/defstream/nl3-rs"
+            class="rounded-xl bg-gradient-to-br from-rust to-rust-deep px-6 py-3 text-sm font-bold text-ink-900 shadow-lg shadow-rust/20 transition hover:scale-[1.03]"
+            >View on GitHub</a
+          >
+          <a
+            href="https://docs.rs/nl3-rs"
+            class="rounded-xl border border-white/10 bg-white/5 px-6 py-3 text-sm font-semibold text-white transition hover:border-white/25"
+            >Read the docs</a
+          >
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-white/5">
+      <div class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 py-10 text-sm text-slate-500 sm:flex-row">
+        <div class="flex items-center gap-2.5">
+          <span class="grid h-7 w-7 place-items-center rounded-lg bg-gradient-to-br from-rust to-rust-deep text-xs font-extrabold text-ink-900">n3</span>
+          <span>nl3·rs - MIT licensed</span>
+        </div>
+        <div class="flex items-center gap-6">
+          <a href="https://github.com/defstream/nl3-rs" class="transition hover:text-white">GitHub</a>
+          <a href="https://docs.rs/nl3-rs" class="transition hover:text-white">docs.rs</a>
+          <a href="https://crates.io/crates/nl3-rs" class="transition hover:text-white">crates.io</a>
+        </div>
+      </div>
+      <p class="pb-8 text-center text-xs text-slate-600">
+        Brought to you by Hector Gray (@defstream).
+      </p>
+    </footer>
+
+    <script>
+      // --- Code samples for the tabbed viewer ---
+      const samples = {
+        quick: `use nl3::Nl3;
+
+let nl3 = Nl3::builder()
+    .grammar(["users message users"])
+    .vocabulary([
+        ("msg", "message"),
+        ("messag", "message"),
+        ("contact", "message"),
+    ])
+    .build();
+
+let triple = nl3.parse("user jack contacts user jill").unwrap();
+
+assert_eq!(triple.subject.value.as_deref(), Some("jack"));
+assert_eq!(triple.predicate.value.as_deref(), Some("message"));
+assert_eq!(triple.object.value.as_deref(), Some("jill"));`,
+        vocab: `// Many phrasings, one triple - synonyms and tenses fold together.
+let nl3 = Nl3::builder()
+    .grammar(["users send messages"])
+    .vocabulary([
+        ("send", "send"),   // sends
+        ("sent", "send"),   // sent
+        ("mail", "send"),   // mailed
+    ])
+    .build();
+
+for phrase in [
+    "user bob sends message 42",
+    "user bob sent message 42",
+    "user bob mailed message 42",
+] {
+    let t = nl3.parse(phrase).unwrap();
+    assert_eq!(t.predicate.value.as_deref(), Some("send"));
+}`,
+        infer: `// Omit the entity type - nl3 infers it from the grammar.
+let nl3 = Nl3::builder()
+    .grammar(["users message users"])
+    .vocabulary([("contact", "message")])
+    .build();
+
+// "message" only ever relates a user to a user, so both ends resolve.
+let t = nl3.parse("jack contacts jill").unwrap();
+
+assert_eq!(t.subject.ty.as_deref(), Some("user"));  // inferred
+assert_eq!(t.subject.value.as_deref(), Some("jack"));
+assert_eq!(t.object.ty.as_deref(), Some("user"));   // inferred
+assert_eq!(t.object.value.as_deref(), Some("jill"));`,
+        errors: `use nl3::{Nl3, ParseError};
+
+let nl3 = Nl3::builder()
+    .grammar(["users follow users"])
+    .vocabulary([("follow", "follow")])
+    .build();
+
+// Empty input and invalid triples are distinct, matchable errors.
+assert!(matches!(nl3.parse(""), Err(ParseError::EmptyInput)));
+
+assert!(matches!(
+    nl3.parse("dog jim hates cat sue"),
+    Err(ParseError::InvalidTriple(_)),
+));`,
+        tagger: `use nl3::{tagger::Tagger, Nl3};
+
+// Bring your own part-of-speech tagger.
+struct MyTagger;
+
+impl Tagger for MyTagger {
+    fn tag(&self, text: &str) -> Vec<(String, String)> {
+        text.split_whitespace()
+            .map(|t| (t.to_string(), "NN".to_string()))
+            .collect()
+    }
+}
+
+let nl3 = Nl3::builder()
+    .grammar(["users follow users"])
+    .vocabulary([("follow", "follow")])
+    .tagger(MyTagger)
+    .build();`,
+      };
+
+      const codeEl = document.getElementById('code-block');
+      const buttons = document.querySelectorAll('.tab-btn');
+
+      function activate(tab) {
+        codeEl.textContent = samples[tab];
+        codeEl.removeAttribute('data-highlighted');
+        codeEl.className = 'language-rust';
+        hljs.highlightElement(codeEl);
+        buttons.forEach((b) => {
+          const on = b.dataset.tab === tab;
+          b.classList.toggle('bg-rust/15', on);
+          b.classList.toggle('text-white', on);
+          b.classList.toggle('ring-1', on);
+          b.classList.toggle('ring-rust/40', on);
+          b.classList.toggle('text-slate-400', !on);
+          b.classList.toggle('hover:text-white', !on);
+        });
+      }
+
+      buttons.forEach((b) => b.addEventListener('click', () => activate(b.dataset.tab)));
+
+      function copyInstall(btn) {
+        navigator.clipboard.writeText('[dependencies]\nnl3-rs = "0.1"').then(() => {
+          const original = btn.textContent;
+          btn.textContent = 'Copied!';
+          setTimeout(() => (btn.textContent = original), 1500);
+        });
+      }
+
+      // init
+      hljs.highlightAll();
+      activate('quick');
+    </script>
+  </body>
+</html>
