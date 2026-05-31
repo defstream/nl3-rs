@@ -1,6 +1,6 @@
 # nl3
 
-[![CI](https://github.com/defstream/nl3/actions/workflows/ci.yml/badge.svg)](https://github.com/defstream/nl3/actions/workflows/ci.yml)
+[![CI](https://github.com/defstream/nl3-rs/actions/workflows/ci.yml/badge.svg)](https://github.com/defstream/nl3-rs/actions/workflows/ci.yml)
 ![MSRV](https://img.shields.io/badge/MSRV-1.95-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
