@@ -296,4 +296,4 @@ Porter-stemmer pass. Measured with the [`parse`](benches/parse.rs) benchmark
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+Licensed under the [MIT License](LICENSE) by Hector Gray ([@defstream](https://github.com/defstream)).
