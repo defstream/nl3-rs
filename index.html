@@ -115,7 +115,7 @@
           <a href="#install" class="transition hover:text-white">Install</a>
         </div>
         <a
-          href="https://github.com/defstream/nl3-rs "
+          href="https://github.com/defstream/nl3-rs"
           class="group inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3.5 py-2 text-sm font-semibold text-white transition hover:border-rust/50 hover:bg-rust/10"
         >
           <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -137,7 +137,7 @@
             class="animate-fadeup inline-flex items-center gap-2 rounded-full border border-rust/30 bg-rust/10 px-3 py-1 text-xs font-semibold text-rust"
           >
             <span class="h-1.5 w-1.5 rounded-full bg-rust"></span>
-
+            A Rust port of the nl3 natural-language-triples library
           </span>
           <h1
             class="animate-fadeup mt-6 text-4xl font-extrabold leading-[1.05] tracking-tight text-white sm:text-6xl"
@@ -154,10 +154,10 @@
             and reversed phrasings.
           </p>
           <div class="animate-fadeup mt-9 flex flex-wrap items-center justify-center gap-3">
-            <aAll All
+            <a
               href="#install"
               class="rounded-xl bg-gradient-to-br from-rust to-rust-deep px-6 py-3 text-sm font-bold text-ink-900 shadow-lg shadow-rust/20 transition hover:scale-[1.03]"
-              >Get started</aAll
+              >Get started</a
             >
             <a
               href="#examples"
@@ -297,6 +297,22 @@
               oriented triple.
             </p>
           </div>
+          <div class="card-glow rounded-2xl border border-white/10 bg-ink-900/50 p-6 transition">
+            <h3 class="font-semibold text-white">Type inference</h3>
+            <p class="mt-2 text-sm leading-relaxed text-slate-400">
+              Omit an entity type and nl3 infers it from the grammar -
+              <code class="font-mono text-rust">jack contacts jill</code> resolves both ends. An
+              <code class="font-mono text-rust">Ambiguity</code> policy controls the multi-match case.
+            </p>
+          </div>
+          <div class="card-glow rounded-2xl border border-white/10 bg-ink-900/50 p-6 transition">
+            <h3 class="font-semibold text-white">Fast &amp; serde-ready</h3>
+            <p class="mt-2 text-sm leading-relaxed text-slate-400">
+              Single-digit-microsecond parses with a per-thread stem cache. Opt into the
+              <code class="font-mono text-rust">serde</code> feature to serialize triples to JSON
+              and back.
+            </p>
+          </div>
         </div>
       </div>
     </section>
@@ -338,7 +354,7 @@
 
         <div class="group relative mx-auto mt-8 max-w-xl">
           <pre class="overflow-x-auto rounded-xl border border-white/10 bg-ink-900/80 p-5 text-left"><code class="language-toml font-mono text-sm">[dependencies]
-nl3-rs = "0.1"</code></pre>
+nl3-rs = "1.0"</code></pre>
           <button
             onclick="copyInstall(this)"
             class="absolute right-3 top-3 rounded-md border border-white/10 bg-white/5 px-2.5 py-1.5 text-xs font-semibold text-slate-300 transition hover:border-rust/50 hover:text-white"
@@ -490,7 +506,7 @@ let nl3 = Nl3::builder()
       buttons.forEach((b) => b.addEventListener('click', () => activate(b.dataset.tab)));
 
       function copyInstall(btn) {
-        navigator.clipboard.writeText('[dependencies]\nnl3-rs = "0.1"').then(() => {
+        navigator.clipboard.writeText('[dependencies]\nnl3-rs = "1.0"').then(() => {
           const original = btn.textContent;
           btn.textContent = 'Copied!';
           setTimeout(() => (btn.textContent = original), 1500);

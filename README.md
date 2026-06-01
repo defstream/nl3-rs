@@ -29,7 +29,7 @@ object:    { ty: "user", value: "jill" }
 
 ```toml
 [dependencies]
-nl3-rs = "0.1"
+nl3-rs = "1.0"
 ```
 
 The crate is imported as `nl3`:
@@ -45,7 +45,7 @@ use nl3::Nl3;
 
   ```toml
   [dependencies]
-  nl3-rs = { version = "0.1", features = ["serde"] }
+  nl3-rs = { version = "1.0", features = ["serde"] }
   ```
 
 ### MSRV

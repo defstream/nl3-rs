@@ -1,6 +1,6 @@
 [package]
 name = "nl3-rs"
-version = "1.0.2"
+version = "1.0.3"
 edition = "2024"
 rust-version = "1.95"
 description = "Natural language triples — parse plain-English Subject-Predicate-Object phrases into validated triples."
