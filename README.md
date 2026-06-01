@@ -260,12 +260,14 @@ Runnable examples live in [`examples/`](examples/):
 | [`messenger`](examples/messenger.rs) | A fuller domain plus both error modes |
 | [`ambiguity`](examples/ambiguity.rs) | Disallowing ambiguous inference with [`Ambiguity::Error`] |
 | [`custom_tagger`](examples/custom_tagger.rs) | Supplying your own [`Tagger`] |
+| [`adventure`](examples/adventure.rs) | A playable text adventure — grammar as game affordances |
 
 ```shell
 cargo run --example basic
 cargo run --example messenger
 cargo run --example ambiguity
 cargo run --example custom_tagger
+cargo run --example adventure
 ```
 
 ## Development
