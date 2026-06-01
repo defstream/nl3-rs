@@ -11,7 +11,7 @@ rustc-ice-*.txt
 *.swp
 *~
 
-.claude
+/.claude
 
 # macOS
 .DS_Store
